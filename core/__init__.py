@@ -1,3 +1,3 @@
 # Core package
 
-from .captcha import *
+from .captcha import CAPTCHA, FeatureDisabledError

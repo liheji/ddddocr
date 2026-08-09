@@ -2,42 +2,47 @@
 标准化响应工具类
 参考 Java R 类实现统一响应格式
 """
-from flask import jsonify
 from typing import Any, Optional, Dict
+
+from flask import Response, jsonify
+
+from const.errno import Errno
 
 
 class R(dict):
     """统一响应格式类"""
 
-    def __init__(self, code: int = 0, msg: str = "success", data: Any = None):
+    def __init__(self, code: Errno = Errno.SUCCESS, msg: Optional[str] = None, data: Any = None):
         """
         初始化响应对象
-        :param code: 状态码，0表示成功，非0表示失败
-        :param msg: 响应消息
+        :param code: 错误码（Errno 枚举）
+        :param msg: 响应消息，缺省使用 code.message
         :param data: 响应数据
         """
+        if not isinstance(code, Errno):
+            raise ValueError(f"code 必须是 Errno 枚举，当前: {code}")
         super().__init__()
         self['code'] = code
-        self['msg'] = msg
+        self['msg'] = msg if msg is not None else code.message
         if data is not None:
             self['data'] = data
 
     @classmethod
-    def ok(cls, msg: str = "success", data: Any = None) -> 'R':
+    def ok(cls, msg: Optional[str] = None, data: Any = None) -> 'R':
         """
         成功响应
-        :param msg: 响应消息
+        :param msg: 响应消息，缺省为 success
         :param data: 响应数据
         :return: R对象
         """
-        return cls(code=0, msg=msg, data=data)
+        return cls(code=Errno.SUCCESS, msg=msg, data=data)
 
     @classmethod
-    def error(cls, code: int = 1, msg: str = "failure", data: Any = None) -> 'R':
+    def error(cls, code: Errno = Errno.FAILURE, msg: Optional[str] = None, data: Any = None) -> 'R':
         """
         错误响应
-        :param code: 错误码
-        :param msg: 错误消息
+        :param code: 错误码（Errno 枚举），缺省为 FAILURE
+        :param msg: 错误消息，缺省使用 code.message
         :param data: 错误数据
         :return: R对象
         """
@@ -50,7 +55,7 @@ class R(dict):
         :param msg: 错误消息
         :return: R对象
         """
-        return cls.error(code=1, msg=msg)
+        return cls.error(code=Errno.FAILURE, msg=msg)
 
     def put(self, key: str, value: Any) -> 'R':
         """
@@ -86,6 +91,6 @@ class R(dict):
         """转换为字典"""
         return dict(self)
 
-    def json(self):
+    def json(self) -> Response:
         """转换为Flask JSON响应"""
         return jsonify(self.to_dict())

@@ -16,6 +16,10 @@ env/
 ENV/
 .ENV/
 
+# Tests
+tests/
+.pytest_cache/
+
 # IDE
 .idea/
 .vscode/

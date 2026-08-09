@@ -1,7 +1,0 @@
-ddddocr
-Flask
-flask-cors
-requests
-numpy
-opencv-python-headless
-Pillow

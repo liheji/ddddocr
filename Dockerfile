@@ -10,7 +10,7 @@ RUN mkdir -p logs
 COPY . /app
 
 # 安装项目依赖
-RUN pip install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple && pip cache purge
+RUN pip install --no-cache-dir ".[server]" && pip cache purge
 
 # 设置环境变量
 ENV PYTHONUNBUFFERED=1
@@ -22,4 +22,4 @@ ENV HOST=0.0.0.0
 EXPOSE 7777
 
 # 运行项目
-CMD ["python", "app.py"]
+CMD ["sh", "-c", "exec gunicorn --bind ${HOST:-0.0.0.0}:${PORT:-7777} --threads 4 --access-logfile - --error-logfile - app:app"]

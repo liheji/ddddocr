@@ -29,6 +29,9 @@ env.bak/
 app.log
 logs/
 
+# Test
+.pytest_cache/
+
 # Environment
 .env
 .env.local
